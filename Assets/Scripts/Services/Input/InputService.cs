@@ -26,6 +26,9 @@ namespace Playground.Services.Input
         {
             if (IsJump)
             {
+                
+                
+                
                 OnJumpClicked?.Invoke();
             }
         }
