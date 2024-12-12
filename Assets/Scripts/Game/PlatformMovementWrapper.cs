@@ -13,8 +13,6 @@ namespace Playground.Game
         {
             _platformMovement1.Move();
             _platformMovement2.MoveLinear();
-            
-            
         }
     }
 }
