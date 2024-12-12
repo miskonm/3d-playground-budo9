@@ -15,6 +15,8 @@ namespace Playground.Services.Input
 
         public Vector2 Axis => new(UnityEngine.Input.GetAxis("Horizontal"), UnityEngine.Input.GetAxis("Vertical"));
         public bool IsJump => UnityEngine.Input.GetButtonDown("Jump");
+        
+        
         public bool IsRun => UnityEngine.Input.GetButton("Fire3");
         public Vector3 MousePosition => UnityEngine.Input.mousePosition;
 
