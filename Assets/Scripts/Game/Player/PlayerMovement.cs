@@ -3,12 +3,13 @@ using Playground.Services.Input;
 using UnityEngine;
 using Zenject;
 
-namespace Playground.Game
+namespace Playground.Game.Player
 {
     public class PlayerMovement : MonoBehaviour
     {
         #region Variables
 
+        [SerializeField] private PlayerAnimation _animation;
         [SerializeField] private CharacterController _controller;
         [SerializeField] private float _speed = 10f;
         [SerializeField] private float _runSpeed = 20f;
@@ -48,7 +49,8 @@ namespace Playground.Game
         {
             Vector2 axis = _inputService.Axis;
             _moveVector = transform.right * axis.x + transform.forward * axis.y;
-            _moveVector *= _inputService.IsRun ? _runSpeed : _speed;
+            float speed = _inputService.IsRun ? _runSpeed : _speed;
+            _moveVector *= speed;
 
             bool isGrounded =
                 Physics.CheckSphere(_checkGroundTransform.position, _checkGroundRadius, _checkGroundLayerMask);
@@ -66,6 +68,10 @@ namespace Playground.Game
             }
 
             _fallVector += gravity * Time.deltaTime;
+
+            _animation.SetMovement(axis * speed);
+            _animation.SetGrounded(isGrounded);
+            _animation.SetSpeedY(_fallVector.y);
         }
 
         private void FixedUpdate()

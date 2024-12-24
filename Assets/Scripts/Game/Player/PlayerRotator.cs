@@ -2,7 +2,7 @@ using Playground.Services.Input;
 using UnityEngine;
 using Zenject;
 
-namespace Playground.Game
+namespace Playground.Game.Player
 {
     public class PlayerRotator : MonoBehaviour
     {
@@ -37,7 +37,7 @@ namespace Playground.Game
             float currentPositionX = _inputService.MousePosition.x;
             float delta = currentPositionX - _previousPositionX;
 
-            transform.Rotate(Vector3.up, delta * _sensitivity);
+            transform.Rotate(Vector3.up, delta * _sensitivity * Time.deltaTime);
 
             _previousPositionX = currentPositionX;
         }
