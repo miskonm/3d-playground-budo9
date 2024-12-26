@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Playground.Services.SceneLoading;
 
 namespace Playground.Services.State.Client
@@ -23,11 +24,20 @@ namespace Playground.Services.State.Client
 
         public override void Enter()
         {
-            _sceneLoadingService.LoadScene(SceneName.Sample);
-            StateMachine.Enter<GameState>();
+            EnterAsync().Forget();
         }
 
         public override void Exit() { }
+
+        #endregion
+
+        #region Private methods
+
+        private async UniTaskVoid EnterAsync()
+        {
+            await _sceneLoadingService.LoadSceneAsync(SceneName.Sample);
+            StateMachine.Enter<GameState>();
+        }
 
         #endregion
     }

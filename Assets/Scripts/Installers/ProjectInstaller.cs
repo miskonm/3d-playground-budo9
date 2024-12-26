@@ -4,6 +4,7 @@ using Playground.Services.Input;
 using Playground.Services.Pause;
 using Playground.Services.SceneLoading;
 using Playground.Services.State;
+using Playground.Services.TestCountDown;
 using Playground.Services.UI;
 using Zenject;
 
@@ -20,6 +21,7 @@ namespace Playground.Installers
             CoroutineRunnerInstaller.Install(Container);
             PauseServiceInstaller.Install(Container);
             ScreenControllersInstaller.Install(Container);
+            TestCountDownServiceInstaller.Install(Container);
         }
     }
 }

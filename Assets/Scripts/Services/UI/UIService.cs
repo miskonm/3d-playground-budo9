@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Playground.Services.UI
@@ -43,6 +44,15 @@ namespace Playground.Services.UI
         {
             Transform layerParent = _layersController.GetLayerParent();
             T screenPrefab = _screenProvider.GetPrefab<T>();
+            T uiScreen = Object.Instantiate(screenPrefab, layerParent);
+            uiScreen.Open();
+            return uiScreen;
+        }
+
+        public async UniTask<T> OpenScreenAsync<T>() where T : UIScreen
+        {
+            Transform layerParent = _layersController.GetLayerParent();
+            T screenPrefab = await _screenProvider.GetPrefabAsync<T>();
             T uiScreen = Object.Instantiate(screenPrefab, layerParent);
             uiScreen.Open();
             return uiScreen;
