@@ -1,3 +1,4 @@
+using Playground.Services.Score;
 using Playground.Services.UI;
 
 namespace Playground.Services.State.Client
@@ -7,14 +8,16 @@ namespace Playground.Services.State.Client
         #region Variables
 
         private readonly UIService _uiService;
+        private readonly ScoreService _scoreService;
 
         #endregion
 
         #region Setup/Teardown
 
-        public BootstrapState(UIService uiService)
+        public BootstrapState(UIService uiService, ScoreService scoreService)
         {
             _uiService = uiService;
+            _scoreService = scoreService;
         }
 
         #endregion
@@ -24,6 +27,7 @@ namespace Playground.Services.State.Client
         public override void Enter()
         {
             _uiService.Initialize();
+            _scoreService.Initialize();
             
             StateMachine.Enter<LoadGameState>();
         }

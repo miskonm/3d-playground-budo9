@@ -2,7 +2,9 @@ using Playground.ScreenControllers;
 using Playground.Services.Coroutines;
 using Playground.Services.Input;
 using Playground.Services.Pause;
+using Playground.Services.Save;
 using Playground.Services.SceneLoading;
+using Playground.Services.Score;
 using Playground.Services.State;
 using Playground.Services.TestCountDown;
 using Playground.Services.UI;
@@ -22,6 +24,8 @@ namespace Playground.Installers
             PauseServiceInstaller.Install(Container);
             ScreenControllersInstaller.Install(Container);
             TestCountDownServiceInstaller.Install(Container);
+            ScoreServiceInstaller.Install(Container);
+            SaveServiceInstaller.Install(Container);
         }
     }
 }
