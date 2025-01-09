@@ -3,10 +3,11 @@ using UnityEngine;
 
 namespace Playground.Services.UI
 {
-    public class UIService
+    public class UIService : IUIServiceInternal
     {
         #region Variables
 
+        private readonly UIScreenFactory _factory;
         private readonly UILayersController _layersController;
         private readonly UIScreenProvider _screenProvider;
 
@@ -14,10 +15,20 @@ namespace Playground.Services.UI
 
         #region Setup/Teardown
 
-        public UIService(UILayersController layersController, UIScreenProvider screenProvider)
+        public UIService(UILayersController layersController, UIScreenProvider screenProvider, UIScreenFactory factory)
         {
             _layersController = layersController;
             _screenProvider = screenProvider;
+            _factory = factory;
+        }
+
+        #endregion
+
+        #region IUIServiceInternal
+
+        void IUIServiceInternal.CloseScreenInternal(UIScreen uiScreen)
+        {
+            Object.Destroy(uiScreen.gameObject);
         }
 
         #endregion
@@ -32,7 +43,6 @@ namespace Playground.Services.UI
             }
 
             screen.Close();
-            Object.Destroy(screen.gameObject);
         }
 
         public void Initialize()
@@ -44,17 +54,35 @@ namespace Playground.Services.UI
         {
             Transform layerParent = _layersController.GetLayerParent();
             T screenPrefab = _screenProvider.GetPrefab<T>();
-            T uiScreen = Object.Instantiate(screenPrefab, layerParent);
+            T uiScreen = _factory.Create(screenPrefab, layerParent);
             uiScreen.Open();
             return uiScreen;
         }
 
         public async UniTask<T> OpenScreenAsync<T>() where T : UIScreen
         {
+            T uiScreen = await CreateScreenInstanceAsync<T>();
+            uiScreen.Open();
+            return uiScreen;
+        }
+
+        public async UniTask<TScreen> OpenScreenAsync<TScreen, TModel>(TModel model) where TScreen : UIScreen<TModel>
+        {
+            TScreen uiScreen = await CreateScreenInstanceAsync<TScreen>();
+            uiScreen.SetModel(model);
+            uiScreen.Open();
+            return uiScreen;
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private async UniTask<T> CreateScreenInstanceAsync<T>() where T : UIScreen
+        {
             Transform layerParent = _layersController.GetLayerParent();
             T screenPrefab = await _screenProvider.GetPrefabAsync<T>();
-            T uiScreen = Object.Instantiate(screenPrefab, layerParent);
-            uiScreen.Open();
+            T uiScreen = _factory.Create(screenPrefab, layerParent);
             return uiScreen;
         }
 

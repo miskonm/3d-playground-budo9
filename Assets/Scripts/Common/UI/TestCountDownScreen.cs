@@ -8,11 +8,23 @@ using UnityEngine;
 
 namespace Playground.Common.UI
 {
-    public class TestCountDownScreen : UIScreen
+    public class TestCountDownScreen : UIScreen<TestCountDownScreen.Model>
     {
-        #region Variables
+        #region Public Nested Types
 
-        private const int StartNumber = 3;
+        public class Model
+        {
+            #region Variables
+
+            public Action countDownCompletedCallback;
+            public int startNumber;
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Variables
 
         [SerializeField] private TMP_Text _countDownLabel;
         [SerializeField] private CanvasGroup _canvasGroup;
@@ -28,18 +40,12 @@ namespace Playground.Common.UI
 
         #endregion
 
-        #region Events
-
-        public event Action OnCountDownCompleted;
-
-        #endregion
-
         #region Public methods
 
         public void StartCountDown()
         {
             Sequence sequence = DOTween.Sequence();
-            for (int i = 0; i < StartNumber; i++)
+            for (int i = 0; i < _currentNumber; i++)
             {
                 sequence.Append(_countDownLabel.transform.DOScale(_maxScale, 0.5f).SetEase(_scaleUpEase));
                 sequence.Append(_countDownLabel.transform.DOScale(1, 0.5f).SetEase(_scaleDownEase));
@@ -51,7 +57,7 @@ namespace Playground.Common.UI
             }
 
             sequence.AppendInterval(0.1f);
-            sequence.OnComplete(() => OnCountDownCompleted?.Invoke());
+            sequence.OnComplete(() => ScreenModel.countDownCompletedCallback?.Invoke());
             _tween = sequence;
         }
 
@@ -70,8 +76,13 @@ namespace Playground.Common.UI
         {
             base.OnOpen();
 
-            _currentNumber = StartNumber;
+            _currentNumber = ScreenModel.startNumber;
             UpdateCountDownLabel();
+        }
+
+        protected override UniTask PlayCloseAnimationAsync()
+        {
+            return _canvasGroup.DOFade(0, _fadeInAnimationTime).SetUpdate(true).ToUniTask();
         }
 
         protected override UniTask PlayOpenAnimationAsync()
@@ -86,7 +97,7 @@ namespace Playground.Common.UI
         [Button]
         private void TestStart()
         {
-            _currentNumber = StartNumber;
+            _currentNumber = ScreenModel.startNumber;
             UpdateCountDownLabel();
             StartCountDown();
         }

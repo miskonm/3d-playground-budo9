@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 
 namespace Playground.Services.UI
 {
@@ -7,21 +8,28 @@ namespace Playground.Services.UI
     {
         #region Variables
 
+        private UniTaskCompletionSource _closeAnimationTCS;
         private UniTaskCompletionSource _openAnimationTCS;
 
         #endregion
 
         #region Properties
 
+        public UniTask CloseAnimationTask => _closeAnimationTCS.Task;
         public UniTask OpenAnimationTask => _openAnimationTCS.Task;
+
+        protected UIService UIService { get; private set; }
 
         #endregion
 
-        #region Unity lifecycle
+        #region Setup/Teardown
 
-        private void Awake()
+        [Inject]
+        public void Construct(UIService uiService)
         {
+            UIService = uiService;
             _openAnimationTCS = new UniTaskCompletionSource();
+            _closeAnimationTCS = new UniTaskCompletionSource();
         }
 
         #endregion
@@ -30,9 +38,12 @@ namespace Playground.Services.UI
 
         public void Close()
         {
-            OnClose();
-            // TODO: Nikita fix it plz
-            PlayCloseAnimationAsync().Forget();
+            CloseInternalAsync().Forget();
+        }
+
+        public UniTask CloseAsync()
+        {
+            return CloseInternalAsync();
         }
 
         public void Open()
@@ -62,10 +73,39 @@ namespace Playground.Services.UI
 
         #region Private methods
 
+        private async UniTask CloseInternalAsync()
+        {
+            OnClose();
+
+            await PlayCloseAnimationAsync();
+
+            _closeAnimationTCS.TrySetResult();
+
+            ((IUIServiceInternal)UIService).CloseScreenInternal(this);
+        }
+
         private async UniTaskVoid PlayOpenAnimationInternalAsync()
         {
             await PlayOpenAnimationAsync();
             _openAnimationTCS.TrySetResult();
+        }
+
+        #endregion
+    }
+
+    public abstract class UIScreen<TModel> : UIScreen
+    {
+        #region Properties
+
+        protected TModel ScreenModel { get; private set; }
+
+        #endregion
+
+        #region Public methods
+
+        public void SetModel(TModel model)
+        {
+            ScreenModel = model;
         }
 
         #endregion

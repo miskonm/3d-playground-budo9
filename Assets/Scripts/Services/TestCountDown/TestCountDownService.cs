@@ -11,6 +11,8 @@ namespace Playground.Services.TestCountDown
         #region Variables
 
         private TestCountDownScreen _screen;
+
+        private int _showNumber;
         private UIService _uiService;
 
         #endregion
@@ -41,17 +43,20 @@ namespace Playground.Services.TestCountDown
 
         private void CountDownCompletedCallback()
         {
-            _screen.OnCountDownCompleted -= CountDownCompletedCallback;
-            // await _screen.CloseAsync(); TODO: Nikita do it. And fix close from screen.
-            _uiService.CloseScreen(_screen);
+            _screen.Close();
             _screen = null;
         }
 
         private async UniTaskVoid OpenScreenAsync()
         {
-            // TODO: Nikita implement models in screen
-            _screen = await _uiService.OpenScreenAsync<TestCountDownScreen>();
-            _screen.OnCountDownCompleted += CountDownCompletedCallback;
+            TestCountDownScreen.Model model = new()
+            {
+                startNumber = _showNumber > 2 ? 3 : 1,
+                countDownCompletedCallback = CountDownCompletedCallback,
+            };
+
+            _screen = await _uiService.OpenScreenAsync<TestCountDownScreen, TestCountDownScreen.Model>(model);
+            _showNumber++;
             await _screen.OpenAnimationTask;
             _screen.StartCountDown();
         }

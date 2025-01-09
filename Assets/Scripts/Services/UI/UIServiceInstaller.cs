@@ -24,6 +24,7 @@ namespace Playground.Services.UI
             subContainer.Bind<UIService>().AsSingle();
             subContainer.Bind<UILayersController>().AsSingle().WithArguments(Container.DefaultParent);
             subContainer.Bind<UIScreenProvider>().AsSingle();
+            subContainer.Bind<UIScreenFactory>().AsSingle();
         }
 
         #endregion
