@@ -1,4 +1,7 @@
+using System;
+
 namespace Playground.Services.Save
 {
-    public abstract class SaveData { }
+    [Serializable]
+    public class SaveData { }
 }

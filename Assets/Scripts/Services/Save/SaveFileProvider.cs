@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Playground.Utils.Logger;
 using UnityEngine;
@@ -9,14 +10,17 @@ namespace Playground.Services.Save
         #region Variables
 
         private const string FolderName = "Save";
+
         private readonly string _folderPath;
+        private readonly ISaveFileIO _saveFileIO;
 
         #endregion
 
         #region Setup/Teardown
 
-        public SaveFileProvider()
+        public SaveFileProvider(ISaveFileIO saveFileIO)
         {
+            _saveFileIO = saveFileIO;
             _folderPath = Path.Combine(Application.persistentDataPath, FolderName);
         }
 
@@ -30,8 +34,6 @@ namespace Playground.Services.Save
             string dataPathWithExtension = GetFilePathWithExtension(dataPath);
 
             bool isExists = File.Exists(dataPathWithExtension);
-            this.Error(
-                $"_folderPath '{_folderPath}' dataPathWithExtension '{dataPathWithExtension}' isExists '{isExists}'");
 
             if (!isExists)
             {
@@ -39,17 +41,48 @@ namespace Playground.Services.Save
                 File.WriteAllText(dataPathWithExtension, string.Empty);
                 return new T();
             }
-            else
+
+            T obj = null;
+
+            try
             {
-                string json = File.ReadAllText(dataPathWithExtension);
-                // TODO: Convert to real data
-                // return RealData(); 
+                obj = _saveFileIO.Load<T>(dataPathWithExtension);
+            }
+            catch (Exception e)
+            {
+                this.Error($"e '{e}'");
             }
 
-            return null;
+            if (obj == null)
+            {
+                obj = new T();
+            }
+
+            return obj;
         }
 
-        public void SaveData<T>() where T : SaveData { }
+        public void SaveData<T>(T data) where T : SaveData
+        {
+            string name = data.GetType().Name;
+            string dataPath = Path.Combine(_folderPath, name);
+            string dataPathWithExtension = GetFilePathWithExtension(dataPath);
+
+            bool isExists = File.Exists(dataPathWithExtension);
+
+            if (!isExists)
+            {
+                Directory.CreateDirectory(_folderPath);
+            }
+
+            try
+            {
+                _saveFileIO.Save(data, dataPathWithExtension);
+            }
+            catch (Exception e)
+            {
+                this.Error($"e '{e}'");
+            }
+        }
 
         #endregion
 
@@ -57,7 +90,7 @@ namespace Playground.Services.Save
 
         private string GetFilePathWithExtension(string path)
         {
-            return $"{path}.json";
+            return $"{path}.txt";
         }
 
         #endregion

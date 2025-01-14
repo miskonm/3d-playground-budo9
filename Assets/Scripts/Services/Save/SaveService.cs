@@ -12,7 +12,13 @@ namespace Playground.Services.Save
     {
         #region Variables
 
+#if UNITY_EDITOR
+        // TODO: Nikita add drawer
+        [SerializeField] private List<SaveData> _debugSaves = new();
+#endif
+
         private readonly Dictionary<Type, SaveData> _dataByTypes = new();
+
         private SaveFileProvider _saveFileProvider;
 
         #endregion
@@ -20,9 +26,9 @@ namespace Playground.Services.Save
         #region Setup/Teardown
 
         [Inject]
-        public void Construct()
+        public void Construct(SaveFileProvider saveFileProvider)
         {
-            _saveFileProvider = new SaveFileProvider();
+            _saveFileProvider = saveFileProvider;
         }
 
         #endregion
@@ -38,22 +44,41 @@ namespace Playground.Services.Save
             }
 
             T data = _saveFileProvider.LoadData<T>();
-            _dataByTypes.Add(type, data);
+            AddToCache(type, data);
 
             return data;
         }
 
         public void Save<T>() where T : SaveData
         {
-            _saveFileProvider.SaveData<T>();
+            Type type = typeof(T);
+            if (!_dataByTypes.TryGetValue(type, out SaveData value))
+            {
+                return;
+            }
+
+            _saveFileProvider.SaveData(value);
         }
 
         public void SaveAll()
         {
-            // foreach (Type type in _dataByTypes.Keys)
-            // {
-            //     
-            // }
+            foreach (SaveData saveData in _dataByTypes.Values)
+            {
+                _saveFileProvider.SaveData(saveData);
+            }
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void AddToCache(Type type, SaveData data)
+        {
+            _dataByTypes.Add(type, data);
+
+#if UNITY_EDITOR
+            _debugSaves.Add(data);
+#endif
         }
 
         #endregion
