@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Playground.Mediators;
 using Playground.Services.Score;
 using Playground.Services.UI;
 
@@ -7,15 +9,17 @@ namespace Playground.Services.State.Client
     {
         #region Variables
 
-        private readonly UIService _uiService;
+        private readonly List<IMediator> _mediators;
         private readonly ScoreService _scoreService;
+        private readonly UIService _uiService;
 
         #endregion
 
         #region Setup/Teardown
 
-        public BootstrapState(UIService uiService, ScoreService scoreService)
+        public BootstrapState(List<IMediator> mediators, UIService uiService, ScoreService scoreService)
         {
+            _mediators = mediators;
             _uiService = uiService;
             _scoreService = scoreService;
         }
@@ -26,13 +30,31 @@ namespace Playground.Services.State.Client
 
         public override void Enter()
         {
-            _uiService.Initialize();
-            _scoreService.Initialize();
-            
+            InitializeServices();
+            InitializeMediators();
+
             StateMachine.Enter<LoadGameState>();
         }
 
         public override void Exit() { }
+
+        #endregion
+
+        #region Private methods
+
+        private void InitializeMediators()
+        {
+            foreach (IMediator mediator in _mediators)
+            {
+                mediator.Initialize();
+            }
+        }
+
+        private void InitializeServices()
+        {
+            _uiService.Initialize();
+            _scoreService.Initialize();
+        }
 
         #endregion
     }

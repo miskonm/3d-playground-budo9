@@ -33,9 +33,9 @@ namespace Playground.Services.Save
             subContainer.Bind<SaveFileProvider>().AsSingle();
             
             // if dev
-            // subContainer.Bind<ISaveFileIO>().To<SimpleJsonSaveFileIO>().AsSingle();
+            subContainer.Bind<ISaveFileIO>().To<SimpleJsonSaveFileIO>().AsSingle();
             // else
-            subContainer.Bind<ISaveFileIO>().To<XMLSaveFileIO>().AsSingle();
+            // subContainer.Bind<ISaveFileIO>().To<XMLSaveFileIO>().AsSingle();
         }
 
         #endregion

@@ -33,6 +33,12 @@ namespace Playground.Game.Player
 
         #endregion
 
+        #region Properties
+
+        public Vector3 Velocity => _moveVector;
+
+        #endregion
+
         #region Setup/Teardown
 
         [Inject]

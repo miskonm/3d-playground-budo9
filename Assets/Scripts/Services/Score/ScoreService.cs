@@ -38,7 +38,7 @@ namespace Playground.Services.Score
             gameData.score += value;
             gameData.score = Mathf.Max(0, gameData.score);
 
-            _saveService.Save<GameData>();
+            // _saveService.Save<GameData>();
         }
 
         public void Initialize()

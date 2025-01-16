@@ -1,5 +1,8 @@
+using Playground.Mediators;
 using Playground.ScreenControllers;
+using Playground.Services.AppState;
 using Playground.Services.Coroutines;
+using Playground.Services.Events;
 using Playground.Services.Input;
 using Playground.Services.Pause;
 using Playground.Services.Save;
@@ -26,6 +29,9 @@ namespace Playground.Installers
             TestCountDownServiceInstaller.Install(Container);
             ScoreServiceInstaller.Install(Container);
             SaveServiceInstaller.Install(Container);
+            EventBusInstaller.Install(Container);
+            AppStateServiceInstaller.Install(Container);
+            MediatorsInstaller.Install(Container);
         }
     }
 }

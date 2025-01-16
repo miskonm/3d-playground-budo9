@@ -1,6 +1,5 @@
-using Playground.Services.Input;
+using Cinemachine;
 using UnityEngine;
-using Zenject;
 
 namespace Playground.Game.Player
 {
@@ -8,38 +7,25 @@ namespace Playground.Game.Player
     {
         #region Variables
 
-        [SerializeField] private float _sensitivity = 1f;
-
-        private InputService _inputService;
-        private float _previousPositionX;
-
-        #endregion
-
-        #region Setup/Teardown
-
-        [Inject]
-        public void Construct(InputService inputService)
-        {
-            _inputService = inputService;
-        }
+        [SerializeField] private CinemachineFreeLook _freeLook;
+        [SerializeField] private PlayerMovement _movement;
 
         #endregion
 
         #region Unity lifecycle
 
-        private void Start()
+        private void Awake()
         {
-            _previousPositionX = _inputService.MousePosition.x;
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Update()
         {
-            float currentPositionX = _inputService.MousePosition.x;
-            float delta = currentPositionX - _previousPositionX;
-
-            transform.Rotate(Vector3.up, delta * _sensitivity * Time.deltaTime);
-
-            _previousPositionX = currentPositionX;
+            if (_movement.Velocity.magnitude > 0)
+            {
+                Quaternion quaternion = Quaternion.Euler(0, _freeLook.m_XAxis.Value, 0);
+                transform.rotation = Quaternion.Slerp(transform.rotation, quaternion, 0.5f);
+            }
         }
 
         #endregion
